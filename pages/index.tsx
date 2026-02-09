@@ -140,8 +140,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>medgm.com.br - Encurtador de Links</title>
-        <meta name="description" content="Encurtador de links medgm.com.br" />
+        <title>links.medgm.com.br - Encurtador de Links</title>
+        <meta name="description" content="Encurtador de links links.medgm.com.br" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -151,7 +151,7 @@ export default function Home() {
           {/* Formulário principal */}
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              medgm.com.br
+              links.medgm.com.br
             </h1>
             <p className="text-gray-600 mb-6">Encurtador de Links</p>
 

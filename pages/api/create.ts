@@ -64,7 +64,7 @@ export default async function handler(
     await saveShortUrl(slug, url)
 
     return res.status(200).json({
-      shortUrl: `medgm.com.br/${slug}`,
+      shortUrl: `links.medgm.com.br/${slug}`,
       slug,
       customSlug: isCustomSlug
     })
