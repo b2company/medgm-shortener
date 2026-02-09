@@ -7,6 +7,7 @@ type ResponseData = {
   slug?: string
   customSlug?: boolean
   error?: string
+  details?: string
 }
 
 export default async function handler(
