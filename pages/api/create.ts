@@ -40,11 +40,16 @@ export default async function handler(
       }
 
       // Verificar se slug já existe
-      const existing = await getOriginalUrl(customSlug)
-      if (existing) {
-        return res.status(409).json({
-          error: `O slug '${customSlug}' já está em uso`
-        })
+      try {
+        const existing = await getOriginalUrl(customSlug)
+        if (existing) {
+          return res.status(409).json({
+            error: `O slug '${customSlug}' já está em uso`
+          })
+        }
+      } catch (kvError) {
+        console.error('Error checking existing slug:', kvError)
+        // Se falhar ao verificar, continua (permite criar slug customizado)
       }
 
       slug = customSlug
@@ -64,6 +69,10 @@ export default async function handler(
     })
   } catch (error) {
     console.error('Error creating short URL:', error)
-    return res.status(500).json({ error: 'Internal server error' })
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return res.status(500).json({
+      error: 'Erro ao salvar link. Verifique as configurações do banco de dados.',
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    })
   }
 }
