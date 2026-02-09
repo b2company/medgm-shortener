@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { nanoid } from 'nanoid'
-import { saveShortUrl, isValidUrl } from '@/lib/kv'
+import { saveShortUrl, isValidUrl, getOriginalUrl } from '@/lib/kv'
 
 type ResponseData = {
   shortUrl?: string
   slug?: string
+  customSlug?: boolean
   error?: string
 }
 
@@ -16,7 +17,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { url } = req.body
+  const { url, customSlug } = req.body
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'URL is required' })
@@ -27,15 +28,39 @@ export default async function handler(
   }
 
   try {
-    // Gerar slug único de 6 caracteres
-    const slug = nanoid(6)
+    let slug: string
+    let isCustomSlug = false
+
+    if (customSlug) {
+      // Validar formato do slug customizado
+      if (typeof customSlug !== 'string' || !/^[a-zA-Z0-9_-]{2,50}$/.test(customSlug)) {
+        return res.status(400).json({
+          error: 'Slug deve ter 2-50 caracteres (letras, números, - ou _)'
+        })
+      }
+
+      // Verificar se slug já existe
+      const existing = await getOriginalUrl(customSlug)
+      if (existing) {
+        return res.status(409).json({
+          error: `O slug '${customSlug}' já está em uso`
+        })
+      }
+
+      slug = customSlug
+      isCustomSlug = true
+    } else {
+      // Gerar slug único de 6 caracteres
+      slug = nanoid(6)
+    }
 
     // Salvar no KV
     await saveShortUrl(slug, url)
 
     return res.status(200).json({
       shortUrl: `medgm.com.br/${slug}`,
-      slug
+      slug,
+      customSlug: isCustomSlug
     })
   } catch (error) {
     console.error('Error creating short URL:', error)
